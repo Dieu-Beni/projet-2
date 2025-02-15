@@ -17,7 +17,7 @@ jobs:
         run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
       
       - name: Build Docker image
-        run: docker build -t jinsdb7/projet-2:tagname .
+        run: docker build -t jinsdb7/projet-2:latest .
       
       - name: Push Docker image to Docker Hub
-        run: docker push jinsdb7/projet-2:tagname
+        run: docker push jinsdb7/projet-2:latest
