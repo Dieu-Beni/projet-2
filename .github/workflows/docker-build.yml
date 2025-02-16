@@ -1,4 +1,4 @@
-name: Build, Push, and Deploy Docker Image
+name: Deploy to Play-with-Docker
 
 on:
   push:
@@ -6,35 +6,24 @@ on:
       - version2
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      
+
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
-      
-      - name: Build Docker image
-        run: docker build -t jinsdb7/projet-2:latest .
-      
-      - name: Push Docker image to Docker Hub
-        run: docker push jinsdb7/projet-2:latest
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Deploy to Server
+        
+      - name: Pull and Run Container on Play-with-Docker
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
+          host: 192.168.0.28 
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
           script: |
             docker pull jinsdb7/projet-2:latest
             docker stop projet-2 || true
             docker rm projet-2 || true
-            docker run -d --name projet-2 -p 80:80 jinsdb7/projet-2:latest
+            docker run -d -p 80:80 --name projet-2 jinsdb7/projet-2:latest
